@@ -1,0 +1,63 @@
+{
+    "name": "Gene ID Mapping", 
+    "description": "This tool will convert gene names or symbols between several popular schemes. Generally, we encourage users to avoid conversion unless absolutely necessary, as might be the case for certain analyses based on curated pathway databases. Gene identifier conversion is complicated by the fact that there is not a perfect one-to-one mapping between the same genomic locus in multiple naming systems. In some cases, a single ID in one system may map to multiple genes in another, which can introduce undesirable effects. As an example, consider the gene identified by ENSG00000277796 in the Ensembl system. This identifier maps to both gene symbols CCL3L1 and CCL3L3. If one were starting from CCL3L1, it is possible that after a re-mapping (i.e. symbol --> Ensembl --> symbol), the gene could be marked as CCL3L3 instead of the original CCL3L1. In some contexts, this might not matter. In others, this could present a problem.", 
+    "inputs": {
+        "input_file": {
+            "description": "An input file you wish to remap. We will change the identifiers in the first column of your file. Note that we create a new file- the original will remain unedited.", 
+            "name": "Your input file:", 
+            "required": true, 
+            "spec": {
+                "attribute_type": "VariableDataResource", 
+                "resource_types": ["FT", "MTX", "EXP_MTX","RNASEQ_COUNT_MTX","I_MTX"], 
+                "many": false
+            }
+        }, 
+        "organism": {
+            "description": "The organism you are working with. If you would like to request that we add one, please let us know!", 
+            "name": "Reference organism:", 
+            "required": true, 
+            "spec": {
+                "attribute_type": "OptionString",
+                "options": ["Human","Mouse"]
+            }
+        },
+        "initial_id": {
+            "description": "The gene identifier currently in your file. If the identifiers start with ENSG/ENST, then choose Ensembl. If they are \"common\" names (such as \"TP53\"), then choose Symbol. Entrez IDs are integers and are less commonly used.", 
+            "name": "Current gene identifier:", 
+            "required": true, 
+            "spec": {
+                "attribute_type": "OptionString",
+                "options": ["Symbol", "Entrez", "Ensembl"]
+            }
+        },
+        "final_id": {
+            "description": "The desired/target gene identifier.", 
+            "name": "Target gene identifier:", 
+            "required": true, 
+            "spec": {
+                "attribute_type": "OptionString",
+                "options": ["Symbol", "Entrez", "Ensembl"]
+            }
+        }
+    }, 
+    "outputs": {
+        "remapped_file": {
+            "required": true,
+            "spec": {
+                "attribute_type": "VariableDataResource", 
+                "resource_types": ["FT", "MTX", "EXP_MTX","RNASEQ_COUNT_MTX","I_MTX"],
+                "many": false
+            }
+        },
+        "mapping": {
+            "required": true,
+            "spec": {
+                "attribute_type": "DataResource", 
+                "resource_type": "FT",
+                "many": false
+            }
+        }
+    }, 
+    "mode": "local_docker",
+    "workspace_operation": true
+}
