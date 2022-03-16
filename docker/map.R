@@ -54,13 +54,9 @@ orig_names = colnames(df)
 new_names = make.names(orig_names)
 colnames(df) = new_names
 
-# Subset to only include a list of unique IDs for the 
-# initial identifier system and keep only the two columns
-# of interest.
-mapping = mapping[
-  !duplicated(mapping[,initial_id]),
-  c(initial_id, target_id)
-]
+# Subset to only include unique rows for the two systems
+# we are mapping between
+mapping = unique(mapping[,c(initial_id, target_id)])
 mapping = na.omit(mapping)
 
 # set the rownames in prepration for a join
@@ -68,7 +64,7 @@ rownames(mapping) = mapping[,initial_id]
 mapping = mapping[target_id]
 
 # Perform an inner join on the rownames
-merged_df = merge(df, mapping, by=0)
+merged_df = merge(df, mapping, by.x=0, by.y=initial_id)
 
 if (dim(merged_df)[1] == 0) {
     message('The mapping database had zero identifiers in common with your data. Did you specify an incorrect gene identifier or the incorrect organism?')
