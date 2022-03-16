@@ -10,7 +10,14 @@ As an example, consider the gene identified by ENSG00000277796 in the Ensembl sy
 
 Similarly, there are situations where multiple identifiers in one naming scheme map to a single entity in the "target" scheme. For instance, two ENSG IDs can map to the same gene symbol. In this case, it is not clear which ENSG to use. **Note that in such cases where there is ambiguity in the mapping, such as when two ENSG IDs map to a single gene symbol, we retain the gene/row that has the maximum median absolute deviation.** This is based on the concept that a highly variable gene is likely to have more information content than a low-expressed or relatively constant gene. 
 
-As part of the outputs of this process, we create a "map" file which shows how the mapping was performed. Users can then make more informed choices about the mapping after the fact, perhaps with more informed guidance.
+As a toy example, consider the following where we look to map the "ENSG" identifiers to gene symbols (gA, gB, etc.)
+![](gene-mapping.png)
+
+We make a couple of notes about the figure above:
+- ENSG3 maps to *both* gA and gD. Thus, the remapped results have rows for gA and gD with the same contents (row r3). In the case of an actual mapping from Ensembl ENSG to gene symbols, this is **not** a common situation, but we show it here for completeness
+- ENSG5 and ENSG6 both map to gE. In this instance, we choose the row with the largest MAD value. Here, that would be row r6, which corresponds to the original ENSG6. This situation is much more common in mapping Ensembl IDs to gene symbols. 
+
+As part of the outputs of this process, we create a "map" file which shows how the mapping was performed. Users can then make edits after the fact, perhaps with more informed guidance.
 
 
 **Map files**
