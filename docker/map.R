@@ -59,10 +59,6 @@ colnames(df) = new_names
 mapping = unique(mapping[,c(initial_id, target_id)])
 mapping = na.omit(mapping)
 
-# set the rownames in prepration for a join
-rownames(mapping) = mapping[,initial_id]
-mapping = mapping[target_id]
-
 # Perform an inner join on the rownames
 merged_df = merge(df, mapping, by.x=0, by.y=initial_id)
 
@@ -151,7 +147,7 @@ remapped_output_filename = paste(working_dir, remapped_output_filename, sep='/')
 mapping_filename = paste(initial_id, 'to', target_id, 'mapping.tsv', sep='_')
 mapping_filename = paste(working_dir, mapping_filename, sep='/')
 write.table(X, remapped_output_filename, sep='\t', quote=F)
-write.table(mapping, mapping_filename, sep='\t', quote=F)
+write.table(mapping, mapping_filename, sep='\t', quote=F, row.names=F)
 
 json_str = paste0(
        '{"remapped_file":{ "path": "', remapped_output_filename, 
