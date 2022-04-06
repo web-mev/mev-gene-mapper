@@ -22,12 +22,12 @@
             }
         },
         "initial_id": {
-            "description": "The gene identifier currently in your file. If the identifiers start with ENSG/ENST, then choose Ensembl. If they are \"common\" names (such as \"TP53\"), then choose Symbol. Entrez IDs are integers and are less commonly used.", 
+            "description": "The gene identifier currently in your file. If the identifiers start with ENSG/ENST (human) or ENSMUSG/ENSMUST (mouse), then choose Ensembl. If they are \"common\" names (such as \"TP53\"), then choose Symbol. RefSeq IDs typically start with \"NM_\" (or similar prefix).", 
             "name": "Current gene identifier:", 
             "required": true, 
             "spec": {
                 "attribute_type": "OptionString",
-                "options": ["Symbol", "Entrez", "Ensembl"]
+                "options": ["Symbol", "RefSeq", "Ensembl"]
             }
         },
         "final_id": {
@@ -36,7 +36,7 @@
             "required": true, 
             "spec": {
                 "attribute_type": "OptionString",
-                "options": ["Symbol", "Entrez", "Ensembl"]
+                "options": ["Symbol", "RefSeq", "Ensembl"]
             }
         }
     }, 

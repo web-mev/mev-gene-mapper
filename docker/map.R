@@ -37,11 +37,12 @@ setwd(working_dir)
 df = read.table(input_file_path, header=T, check.names=F, row.names=1)
 
 # the organism-specific mapping file. Looks like:
-# "ALIAS"	"ENSEMBL"	"SYMBOL"	"ENTREZID"
-# "1"	"A1B"	"ENSG00000121410"	"A1BG"	"1"
-# "2"	"A1B"	"ENSG00000172164"	"SNTB1"	"6641"
-# "3"	"ABG"	"ENSG00000121410"	"A1BG"	"1"
-# "4"	"GAB"	"ENSG00000121410"	"A1BG"	"1"
+# "ALIAS"	"ENSEMBL"	"SYMBOL"	"REFSEQ"
+# "1"	"A1B"	"ENSG00000121410"	"A1BG"	"NM_130786"
+# "2"	"A1B"	"ENSG00000121410"	"A1BG"	"NP_570602"
+# "3"	"A1B"	"ENSG00000172164"	"SNTB1"	"NM_021021"
+# "4"	"A1B"	"ENSG00000172164"	"SNTB1"	"NP_066301"
+# "5"	"A1B"	"ENSG00000172164"	"SNTB1"	"XM_011517239"
 mapping = read.table(opt$map_file, header=T)
 
 initial_id = toupper(opt$initial_id)
@@ -61,17 +62,9 @@ mapping = na.omit(mapping)
 
 # Perform an inner join on the rownames
 merged_df = merge(df, mapping, by.x=0, by.y=initial_id)
-
 if (dim(merged_df)[1] == 0) {
     message('The mapping database had zero identifiers in common with your data. Did you specify an incorrect gene identifier or the incorrect organism?')
     quit(status=1)
-}
-
-N0 = dim(df)[1]
-N1 = dim(merged_df)[1]
-if (N0/N1 < 0.50) {
-  message('Less than 50% of your genes had mappings between gene identifier systems, which is not expected. Please check your inputs.')
-  quit(status=1)
 }
 
 # Especially for mapping from ENSG to symbol, we encounter situations where 
@@ -136,6 +129,14 @@ X = rbind(merged_df[!has_been_duplicated,], mm_subset)
 # set the rownames
 rownames(X) = X[, target_id]
 
+# Due to the failure of mapping to be 1:1/onto, we provide the mapping file as an additional output
+# HOWEVER, there can be issues with validating files without unique rownames. Since the X dataframe
+# above has unique rownames, we then use that to subset the original `mapping` dataframe which can
+# cause issues (in WebMeV's file validation schemes) if it's directly written to file. Beyond that, 
+# users would only care about where their target gene came from.
+final_mapping <- X[,c('Row.names', target_id)]
+colnames(final_mapping) <- c(initial_id, target_id)
+
 # subset to keep only the columns from the original matrix (e.g. no extra mapping cols)
 # and set the sample names to the originals
 X = X[,new_names]
@@ -147,7 +148,7 @@ remapped_output_filename = paste(working_dir, remapped_output_filename, sep='/')
 mapping_filename = paste(initial_id, 'to', target_id, 'mapping.tsv', sep='_')
 mapping_filename = paste(working_dir, mapping_filename, sep='/')
 write.table(X, remapped_output_filename, sep='\t', quote=F)
-write.table(mapping, mapping_filename, sep='\t', quote=F, row.names=F)
+write.table(final_mapping[,c(target_id, initial_id)], mapping_filename, sep='\t', quote=F, row.names=F)
 
 json_str = paste0(
        '{"remapped_file":{ "path": "', remapped_output_filename, 
