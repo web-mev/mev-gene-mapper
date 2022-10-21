@@ -6,6 +6,7 @@
             "description": "An input file you wish to remap. We will change the identifiers in the first column of your file. Note that we create a new file- the original will remain unedited.", 
             "name": "Your input file:", 
             "required": true, 
+            "converter": "api.converters.data_resource.LocalDockerSingleDataResourceWithTypeConverter",
             "spec": {
                 "attribute_type": "VariableDataResource", 
                 "resource_types": ["FT", "MTX", "EXP_MTX","RNASEQ_COUNT_MTX","I_MTX"], 
@@ -16,6 +17,7 @@
             "description": "The organism you are working with. If you would like to request that we add one, please let us know!", 
             "name": "Reference organism:", 
             "required": true, 
+            "converter": "api.converters.basic_attributes.StringConverter",
             "spec": {
                 "attribute_type": "OptionString",
                 "options": ["Human","Mouse"]
@@ -25,6 +27,7 @@
             "description": "The gene identifier currently in your file. If the identifiers start with ENSG/ENST (human) or ENSMUSG/ENSMUST (mouse), then choose Ensembl. If they are \"common\" names (such as \"TP53\"), then choose Symbol. RefSeq IDs typically start with \"NM_\" (or similar prefix).", 
             "name": "Current gene identifier:", 
             "required": true, 
+            "converter": "api.converters.basic_attributes.StringConverter",
             "spec": {
                 "attribute_type": "OptionString",
                 "options": ["Symbol", "RefSeq", "Ensembl"]
@@ -34,6 +37,7 @@
             "description": "The desired/target gene identifier.", 
             "name": "Target gene identifier:", 
             "required": true, 
+            "converter": "api.converters.basic_attributes.StringConverter",
             "spec": {
                 "attribute_type": "OptionString",
                 "options": ["Symbol", "RefSeq", "Ensembl"]
@@ -43,6 +47,7 @@
     "outputs": {
         "remapped_file": {
             "required": true,
+            "converter": "api.converters.data_resource.LocalDockerSingleVariableDataResourceConverter",
             "spec": {
                 "attribute_type": "VariableDataResource", 
                 "resource_types": ["FT", "MTX", "EXP_MTX","RNASEQ_COUNT_MTX","I_MTX"],
@@ -51,6 +56,7 @@
         },
         "mapping": {
             "required": true,
+            "converter": "api.converters.data_resource.LocalDockerSingleDataResourceConverter",
             "spec": {
                 "attribute_type": "DataResource", 
                 "resource_type": "FT",

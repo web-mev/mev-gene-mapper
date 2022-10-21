@@ -1,6 +1,0 @@
-{
-  "input_file":"api.converters.data_resource.LocalDockerSingleDataResourceWithTypeConverter", 
-  "organism": "api.converters.basic_attributes.StringConverter",
-  "initial_id": "api.converters.basic_attributes.StringConverter",
-  "final_id": "api.converters.basic_attributes.StringConverter"
-}
