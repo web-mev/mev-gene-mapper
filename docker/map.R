@@ -48,6 +48,11 @@ mapping = read.table(opt$map_file, header=T)
 initial_id = toupper(opt$initial_id)
 target_id = toupper(opt$target_id)
 
+if (initial_id == target_id) {
+    message('The initial and target gene identifiers were the same. No re-mapping will be performed.')
+    quit(status=1)
+}
+
 # we want to preserve the original sample names. However, we also 
 # want to use `make.names`, so we don't run into any issues with
 # the dataframe ops below.
