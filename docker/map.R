@@ -71,6 +71,13 @@ if (dim(merged_df)[1] == 0) {
     message('The mapping database had zero identifiers in common with your data. Did you specify an incorrect gene identifier or the incorrect organism?')
     quit(status=1)
 }
+# merged_df looks like:
+#         Row.names oncogene  pval  SYMBOL
+# 1 ENSG00000121410        Y 0.010    A1BG
+# 2 ENSG00000197953        Y 0.850 AADACL2
+# 3 ENSG00000261846        Y 0.001 AADACL2
+# 4 ENSG00000277796        N 0.050  CCL3L1
+# 5 ENSG00000277796        N 0.050  CCL3L3
 
 # Especially for mapping from ENSG to symbol, we encounter situations where 
 # multiple ENSG Ids (e.g. ENSG1, ENSG2) map to a single symbol (gX). In such a case,
@@ -97,34 +104,53 @@ duplicated_targets = unique(merged_df[duplicated_targets_filter, target_id])
 has_been_duplicated = merged_df[,target_id] %in% duplicated_targets
 mm_subset = merged_df[has_been_duplicated,]
 
-# to calculate the MAD, need to cast this dataframe as a matrix
-# retaining `new_names` removes the 'extra' columns related to the identifier systems we're mapping between
-mtx = as.matrix(mm_subset[new_names]) 
-mad_vals = apply(mtx,1,mad)
-mm_subset['mad'] = mad_vals
+# if we have a resource type that is all numeric, we can perform a MAD calculation 
+if (resource_type %in% c('MTX','I_MTX','EXP_MTX', 'RNASEQ_COUNT_MTX')){
 
-# We next do a sort first by the ID (which effectively "groups")
-# the genes. Then the second sort on MAD sorts within each group.
-# To do the sort, we need the location of the columns
-cols = colnames(mm_subset)
-mad_col_idx = match('mad', cols)
-target_col_idx = match(target_id, cols)
+    # to calculate the MAD, need to cast this dataframe as a matrix
+    # retaining `new_names` removes the 'extra' columns related to the identifier systems we're mapping between
+    mtx = as.matrix(mm_subset[new_names]) 
+    mad_vals = apply(mtx,1,mad)
+    mm_subset['mad'] = mad_vals
 
-# perform the sort
-mm_subset = mm_subset[
-  order(
-    mm_subset[,target_col_idx], -mm_subset[,mad_col_idx]
-  ), 
-]
+    # We next do a sort first by the ID (which effectively "groups")
+    # the genes. Then the second sort on MAD sorts within each group.
+    # To do the sort, we need the location of the columns
+    cols = colnames(mm_subset)
+    mad_col_idx = match('mad', cols)
+    target_col_idx = match(target_id, cols)
 
-# Now, use the `duplicated` method to create a boolean array
-# which effectively marks the row (within each ambiguous gene)
-# that has the maximum MAD
-is_duped = duplicated(mm_subset[target_id])
-mm_subset=mm_subset[!is_duped,]
+    # perform the sort
+    mm_subset = mm_subset[
+    order(
+        mm_subset[,target_col_idx], -mm_subset[,mad_col_idx]
+    ), 
+    ]
 
-# Now drop the 'mad' column since we don't need it anymore
-mm_subset = subset(mm_subset, select=-c(mad))
+    # Now, use the `duplicated` method to create a boolean array
+    # which effectively marks the row (within each ambiguous gene)
+    # that has the maximum MAD
+    is_duped = duplicated(mm_subset[target_id])
+    mm_subset=mm_subset[!is_duped,]
+
+    # Now drop the 'mad' column since we don't need it anymore
+    mm_subset = subset(mm_subset, select=-c(mad))
+} else {
+
+    # if it was not a "matrix" resource type (which guarantees all numerical entries)
+    # then we can't use the MAD as a proxy for the 'most interesting' gene in a multi-map
+    # situation. In this case, we simply grab the first occurrence.
+
+    # sort by the target symbol (which effectively groups everything)
+    mm_subset = mm_subset[order(mm_subset[,target_id]), ]
+
+    # Now, use the `duplicated` method to create a boolean array
+    # which effectively marks the secondary occurrences, which is the records
+    # we will drop
+    is_duped = duplicated(mm_subset[target_id])
+    mm_subset=mm_subset[!is_duped,]
+
+}
 
 # Now, concatenate the dataframe which contains the un-duplicated genes
 # and the MAD-selected duplicated/ambiguous genes.
