@@ -34,7 +34,7 @@ working_dir <- dirname(input_file_path)
 setwd(working_dir)
 
 # the original file we wish to remap
-df = read.table(input_file_path, header=T, check.names=F, row.names=1)
+df = read.table(input_file_path, header=T, check.names=F, row.names=1, sep='\t')
 
 # the organism-specific mapping file. Looks like:
 # "ALIAS"	"ENSEMBL"	"SYMBOL"	"REFSEQ"
