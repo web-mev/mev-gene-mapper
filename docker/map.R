@@ -43,7 +43,7 @@ df = read.table(input_file_path, header=T, check.names=F, row.names=1, sep='\t')
 # "3"	"A1B"	"ENSG00000172164"	"SNTB1"	"NM_021021"
 # "4"	"A1B"	"ENSG00000172164"	"SNTB1"	"NP_066301"
 # "5"	"A1B"	"ENSG00000172164"	"SNTB1"	"XM_011517239"
-mapping = read.table(opt$map_file, header=T)
+mapping = read.table(opt$map_file, header=T, sep='\t')
 
 initial_id = toupper(opt$initial_id)
 target_id = toupper(opt$target_id)
