@@ -20,14 +20,30 @@ We make a couple of notes about the figure above:
 As part of the outputs of this process, we create a "map" file which shows how the mapping was performed. Users can then make edits after the fact, perhaps with more informed guidance.
 
 
-**Map files**
+**Mapping file**
 
-Note that the mapping is performed by pre-made files that are included in the Docker image. However, we also make those available as part of the repository here. To create them prior to repository commits, we build the container and then run:
+Note that the mapping is performed by pre-made files that are included in the Docker image (located in `/opt/resoures`). To move them onto your local machine, pull the docker image and run:
 ```
 docker run -d \
     --rm \
     -v $PWD:/host \
-    --entrypoint="" 
-    <IMAGE NAME> cp -r /opt/software/resources /host
+    <IMAGE NAME> cp -r /opt/resources /host
 ```
 This will put the mapping files in `./resources/`. 
+
+**To run mapping**
+
+To run mapping on a file, move to the directory where you have your file you would like to re-map. We expect that the first column contains the identifiers. Below, we expose this current directory in the Docker container at `/work`, hence why the file path refers to `/work/<original filename>`
+```
+docker run -d -v $PWD:/work <IMAGE NAME> \
+    Rscript /usr/local/bin/map.R \
+        -f /work/<original filename> \
+        -m <PATH TO MAPPING FILE> \
+        -i <ENSEMBL/SYMBOL/REFSEQ> \
+        -t <ENSEMBL/SYMBOL/REFSEQ>
+```
+The mapping file arg `-m` defines the mapping file to use, which is one of the following:
+- For human: `/opt/resources/human_mappings.tsv`
+- For mouse: `/opt/resources/mouse_mappings.tsv`
+
+The `-i` and `-t` arguments define the input and target identifiers. For example, if you are mapping *from* Ensembl *to* gene symbols, use `-i ENSEMBL` and `-t SYMBOL` (case does not matter).
